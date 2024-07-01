@@ -3,6 +3,7 @@ import random
 
 import torchvision.transforms as transforms
 
+
 class InputHandle:
     def __init__(self, input_param, augmentations=None):
         self.paths = input_param['paths']
@@ -42,22 +43,23 @@ class InputHandle:
                     transforms.RandomVerticalFlip()], p=0.5)
                 )
 
-            if augmentations['color_jitter']:
+
+            if augmentations['random_perspective']:
                 transformation_list.append(
                     transforms.RandomApply([
-                        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1)], p=0.5)
+                        transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3)], p =0.5)
                 )
 
-            if augmentations['invert']:
+            if augmentations['resized_crop']:
                 transformation_list.append(transforms.RandomApply([
-                    transforms.RandomInvert()], p=0.5)
+                    transforms.RandomResizedCrop(size=(64, 64), scale=(0.8, 1.0), ratio=(0.75, 1.33))], p=0.5)
                 )
 
-            if augmentations['sharpness']:
-                transformation_list.append(
-                    transforms.RandomApply([
-                        transforms.RandomAdjustSharpness(sharpness_factor=2)], p=0.5)
+            if augmentations['blur']:
+                transformation_list.append(transforms.RandomApply([
+                    transforms.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 2.0))], p=0.5)
                 )
+
 
             transformation_list.append(transforms.ToTensor())
 

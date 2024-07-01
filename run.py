@@ -73,10 +73,10 @@ parser.add_argument('--num_action_ch', type=int, default=4, help='num action ch'
 parser.add_argument('--use_lr_scheduler', type=int, default=0)
 parser.add_argument('--rotate', type=int, default=0)
 parser.add_argument('--random_flip', type=int, default=0)
-parser.add_argument('--color_jitter', type=int, default=0)
+parser.add_argument('--blur', type=int, default=0)
 parser.add_argument('--affine', type=int, default=0)
-parser.add_argument('--invert', type=int, default=0)
-parser.add_argument('--sharpness', type=int, default=0)
+parser.add_argument('--resized_crop', type=int, default=0)
+parser.add_argument('--random_perspective', type=int, default=0)
 parser.add_argument('--loss_filename', type=str, default='loss')
 
 args = parser.parse_args()
@@ -184,10 +184,10 @@ def train_wrapper(model):
     augmentations = {
         'rotate': args.rotate,
         'random_flip': args.random_flip,
-        'color_jitter': args.color_jitter,
+        'random_perspective': args.random_perspective,
         'affine': args.affine,
-        'invert': args.invert,
-        'sharpness': args.sharpness
+        'blur': args.blur,
+        'resized_crop': args.resized_crop
     }
     if all(value == 0 for value in augmentations.values()):
         augmentations = None
