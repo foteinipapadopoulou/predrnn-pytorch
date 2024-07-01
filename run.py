@@ -70,6 +70,15 @@ parser.add_argument('--conv_on_input', type=int, default=0, help='conv on input'
 parser.add_argument('--res_on_conv', type=int, default=0, help='res on conv')
 parser.add_argument('--num_action_ch', type=int, default=4, help='num action ch')
 
+parser.add_argument('--use_lr_scheduler', type=int, default=0)
+parser.add_argument('--rotate', type=int, default=0)
+parser.add_argument('--random_flip', type=int, default=0)
+parser.add_argument('--color_jitter', type=int, default=0)
+parser.add_argument('--affine', type=int, default=0)
+parser.add_argument('--invert', type=int, default=0)
+parser.add_argument('--sharpness', type=int, default=0)
+parser.add_argument('--loss_filename', type=str, default='loss')
+
 args = parser.parse_args()
 print(args)
 
@@ -170,10 +179,23 @@ def schedule_sampling(eta, itr):
 def train_wrapper(model):
     if args.pretrained_model:
         model.load(args.pretrained_model)
+
+    # Load augmentation arguments
+    augmentations = {
+        'rotate': args.rotate,
+        'random_flip': args.random_flip,
+        'color_jitter': args.color_jitter,
+        'affine': args.affine,
+        'invert': args.invert,
+        'sharpness': args.sharpness
+    }
+    if all(value == 0 for value in augmentations.values()):
+        augmentations = None
+
     # load data
     train_input_handle, test_input_handle = datasets_factory.data_provider(
         args.dataset_name, args.train_data_paths, args.valid_data_paths, args.batch_size, args.img_width,
-        seq_length=args.total_length, injection_action=args.injection_action, is_training=True)
+        seq_length=args.total_length, injection_action=args.injection_action, is_training=True, augmentations=augmentations)
 
     eta = args.sampling_start_value
 

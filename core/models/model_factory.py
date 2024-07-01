@@ -1,6 +1,7 @@
 import os
 import torch
 from torch.optim import Adam
+from torch.optim.lr_scheduler import StepLR
 from core.models import predrnn, predrnn_v2, action_cond_predrnn, action_cond_predrnn_v2
 
 class Model(object):
@@ -22,6 +23,10 @@ class Model(object):
             raise ValueError('Name of network unknown %s' % configs.model_name)
 
         self.optimizer = Adam(self.network.parameters(), lr=configs.lr)
+        self.use_lr_scheduler = configs.use_lr_scheduler
+        if configs.use_lr_scheduler == 1:
+            self.scheduler = StepLR(self.optimizer, step_size=5, gamma=0.1)
+
 
     def save(self, itr):
         stats = {}
@@ -42,6 +47,8 @@ class Model(object):
         next_frames, loss = self.network(frames_tensor, mask_tensor)
         loss.backward()
         self.optimizer.step()
+        if self.use_lr_scheduler == 1:
+            self.scheduler.step()
         return loss.detach().cpu().numpy()
 
     def test(self, frames, mask):

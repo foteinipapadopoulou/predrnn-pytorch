@@ -17,6 +17,9 @@ def train(model, ims, real_input_flag, configs, itr):
         cost += model.train(ims_rev, real_input_flag)
         cost = cost / 2
 
+    with open(f'{configs.gen_frm_dir}/loss/{configs.loss_filename}.txt', 'a') as f:
+        f.write(f"{itr},{cost}\n")
+
     if itr % configs.display_interval == 0:
         print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'itr: ' + str(itr))
         print('training loss: ' + str(cost))

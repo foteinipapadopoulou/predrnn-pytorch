@@ -1,8 +1,10 @@
 import numpy as np
 import random
 
+import torchvision.transforms as transforms
+
 class InputHandle:
-    def __init__(self, input_param):
+    def __init__(self, input_param, augmentations=None):
         self.paths = input_param['paths']
         self.num_paths = len(input_param['paths'])
         self.name = input_param['name']
@@ -18,6 +20,60 @@ class InputHandle:
         self.current_input_length = 0
         self.current_output_length = 0
         self.load()
+        self.augmentations = augmentations
+        if self.augmentations is not None:
+            transformation_list = [transforms.ToPILImage()]
+
+            if augmentations['rotate']:
+                transformation_list.append(transforms.RandomApply([
+                    transforms.RandomRotation(30)], p=0.5)
+                )
+
+            if augmentations['affine']:
+                transformation_list.append(transforms.RandomApply([
+                    transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5)
+                )
+
+            if augmentations['random_flip']:
+                transformation_list.append(transforms.RandomApply([
+                    transforms.RandomHorizontalFlip()], p=0.5)
+                )
+                transformation_list.append(transforms.RandomApply([
+                    transforms.RandomVerticalFlip()], p=0.5)
+                )
+
+            if augmentations['color_jitter']:
+                transformation_list.append(
+                    transforms.RandomApply([
+                        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1)], p=0.5)
+                )
+
+            if augmentations['invert']:
+                transformation_list.append(transforms.RandomApply([
+                    transforms.RandomInvert()], p=0.5)
+                )
+
+            if augmentations['sharpness']:
+                transformation_list.append(
+                    transforms.RandomApply([
+                        transforms.RandomAdjustSharpness(sharpness_factor=2)], p=0.5)
+                )
+
+            transformation_list.append(transforms.ToTensor())
+
+            self.transform = transforms.Compose(transformation_list)
+
+    def apply_augmentations(self, data_slice):
+        augmented_sequence = []
+        for frame in data_slice:
+            frame = frame.astype(np.float32)
+            # Apply transformation
+            augmented_frame = self.transform(frame)
+
+            # Convert back to numpy array
+            augmented_frame = augmented_frame.permute(1, 2, 0).numpy()  # [C, H, W] to [H, W, C]
+            augmented_sequence.append(augmented_frame)
+        return np.stack(augmented_sequence)
 
     def load(self):
         dat_1 = np.load(self.paths[0])
@@ -91,6 +147,8 @@ class InputHandle:
                     self.data['clips'][0, batch_ind, 1]
             data_slice = self.data['input_raw_data'][begin:end, :, :, :]
             data_slice = np.transpose(data_slice,(0,2,3,1))
+            if self.augmentations is not None:
+                data_slice = self.apply_augmentations(data_slice)
             input_batch[i, :self.current_input_length, :, :, :] = data_slice
         input_batch = input_batch.astype(self.input_data_type)
         return input_batch

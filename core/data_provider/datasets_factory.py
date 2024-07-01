@@ -8,7 +8,7 @@ datasets_map = {
 
 
 def data_provider(dataset_name, train_data_paths, valid_data_paths, batch_size,
-                  img_width, seq_length, injection_action, is_training=True):
+                  img_width, seq_length, injection_action, is_training=True, augmentations=None):
     if dataset_name not in datasets_map:
         raise ValueError('Name of dataset unknown %s' % dataset_name)
     train_data_list = train_data_paths.split(',')
@@ -27,7 +27,7 @@ def data_provider(dataset_name, train_data_paths, valid_data_paths, batch_size,
                                  'input_data_type': 'float32',
                                  'is_output_sequence': True,
                                  'name': dataset_name + ' train iterator'}
-            train_input_handle = datasets_map[dataset_name].InputHandle(train_input_param)
+            train_input_handle = datasets_map[dataset_name].InputHandle(train_input_param, augmentations=augmentations)
             train_input_handle.begin(do_shuffle=True)
             return train_input_handle, test_input_handle
         else:
