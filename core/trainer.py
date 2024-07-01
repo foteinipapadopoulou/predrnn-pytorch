@@ -16,8 +16,11 @@ def train(model, ims, real_input_flag, configs, itr):
         ims_rev = np.flip(ims, axis=1).copy()
         cost += model.train(ims_rev, real_input_flag)
         cost = cost / 2
-
-    with open(f'{configs.gen_frm_dir}/loss/{configs.loss_filename}.txt', 'a') as f:
+    directory = f'{configs.gen_frm_dir}/loss'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    
+    with open(f'{directory}/{configs.loss_filename}.txt', 'a') as f:
         f.write(f"{itr},{cost}\n")
 
     if itr % configs.display_interval == 0:
@@ -106,7 +109,7 @@ def test(model, test_input_handle, configs, itr):
 
             psnr[i] += metrics.batch_psnr(pred_frm, real_frm)
             for b in range(configs.batch_size):
-                score, _ = compare_ssim(pred_frm[b], real_frm[b], full=True, multichannel=True)
+                score, _ = compare_ssim(pred_frm[b].squeeze(-1), real_frm[b].squeeze(-1), full=True, multichannel=True)
                 ssim[i] += score
 
         # save prediction examples
