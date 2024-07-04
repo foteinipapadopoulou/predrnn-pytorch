@@ -1,3 +1,7 @@
+# Exploring Data Augmentation and Fine-tuning for PredRNN
+The original repository of PredRNN have been forked in order to apply augmentation techniques randomly on frames with the aim of enhancing model's generalizability. 
+The main changes performed can be found on `mnist.py` and the `plot.py` files in which we applied the techniques and we generated the plot for the report.
+ 
 # PredRNN: A Recurrent Neural Network for Spatiotemporal Predictive Learning (TPAMI 2022)
 
 The predictive learning of spatiotemporal sequences aims to generate future images by learning from the historical context, where the visual dynamics are believed to have modular structures that can be learned with compositional subsystems.

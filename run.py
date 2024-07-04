@@ -70,7 +70,6 @@ parser.add_argument('--conv_on_input', type=int, default=0, help='conv on input'
 parser.add_argument('--res_on_conv', type=int, default=0, help='res on conv')
 parser.add_argument('--num_action_ch', type=int, default=4, help='num action ch')
 
-parser.add_argument('--use_lr_scheduler', type=int, default=0)
 parser.add_argument('--rotate', type=int, default=0)
 parser.add_argument('--random_flip', type=int, default=0)
 parser.add_argument('--blur', type=int, default=0)

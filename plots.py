@@ -1,6 +1,7 @@
 import argparse
 import matplotlib.pyplot as plt
 import os
+import numpy as np
 
 
 def list_txt_files(directory):
@@ -12,11 +13,15 @@ def plot_all_training_costs(directory):
     plt.figure(figsize=(10, 5))
     for file_path in file_paths:
         itrs, costs = read_costs(file_path)
+        # add cubic spline interpolation for smoother plot
+        itrs = np.linspace(0, itrs[-1], 300)
+        costs = np.interp(itrs, range(len(costs)), costs)
+
         label = os.path.basename(file_path).split('.')[0]
         plt.plot(itrs, costs, label=label)
 
     plt.xlabel('Iteration')
-    plt.ylabel('Cost')
+    plt.ylabel('Loss')
     plt.title('Training Loss over Iterations')
     plt.legend()
     plt.grid(True)
