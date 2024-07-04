@@ -47,7 +47,7 @@ class InputHandle:
             if augmentations['random_perspective']:
                 transformation_list.append(
                     transforms.RandomApply([
-                        transforms.RandomPerspective(distortion_scale=0.5, p=0.5, interpolation=3)], p =0.5)
+                        transforms.RandomPerspective(distortion_scale=0.5, p=0.5)], p =0.5)
                 )
 
             if augmentations['resized_crop']:
